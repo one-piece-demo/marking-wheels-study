@@ -35,3 +35,12 @@ window.addEventListener('unhandledrejection', event => {
 **异常边界组件自身内的异常**:
 
 - 处理方法：将边界组件和业务组件分离，各司其职，不能在边界组件中处理逻辑代码，也不能在业务组件中使用`didcatch`
+
+## 造轮子
+
+- 造一个 `ErrorBoundary` 轮子
+- `componentDidCatch` 捕获页面报错，`getDerivedStateFromError` 更新 `ErrorBoundary` 的 `state`，并获取具体 `error`
+- 提供多种展示错误内容入口：`fallback`, `FallbackComponent`, `fallbackRender`
+- 重置钩子：提供 `onReset`, `resetErrorBoundary` 的传值和调用，以实现重置
+- 重置监听数组：监听 `resetKeys` 的变化来重置。对于拥有复杂元素的 `resetKeys` 数组提供 `onResetKeysChange` 让开发者自行判断。在 `componentDidUpdate` 里监听每次渲染时 `resetKeys` 变化，并设置`updatedWithError` 作为 `flag` 判断是否由于 `error` 引发的渲染，对于普通渲染，只要 `resetKeys` 变化，直接重置
+- 提供 `ErrorBoundary` 的2种使用方法：嵌套业务组件，将业务组件传入`withErrorBoundary` 高阶函数。提供 `useErrorBoundary` 钩子给开发者自己抛出 `ErrorBoundary` 不能自动捕获的错误
