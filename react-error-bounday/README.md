@@ -1,4 +1,4 @@
-# my-react-error-bounday
+# react-error-bounday
 
 > 学习轮子🎡，参考 [react-error-boundary github](https://github.com/bvaughn/react-error-boundary)
 
