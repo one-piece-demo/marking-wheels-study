@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+<script>
+  const Vue = {
+    createApp(config) {
+      // 编译过程
+      const compile = (template) => (content, dom) => {
+        // 重新渲染
+        dom.innerText = "";
+        input = document.createElement("input");
+        input.addEventListener("keyup", function () {
+          content.state.message = this.value;
+        });
+        input.setAttribute("value", content.state.message);
+        dom.appendChild(input);
+
+        let button = dom.querySelector("button");
+        button = document.createElement("button");
+        button.addEventListener("click", () => {
+          return content.click.apply(content.state);
+        });
+        button.innerText = content.state.message;
+        dom.appendChild(button);
+      };
+
+      // 生成渲染函数
+      const render = compile(config.template);
+
+      return {
+        mount: function (container) {
+          const dom = document.querySelector(container);
+
+          const setupResult = config.setup();
+
+          // 数据响应更新视图
+          // effective = () => render(setupResult, dom);
+
+          // 监控响应
+          watchEffect(() => render(setupResult, dom));
+
+          render(setupResult, dom);
+        },
+      };
+    },
+  };
+  // 定义响应函数
+  let effective;
+  const App = {
+    // 视图
+    template: `
+            <input v-model="message"/>
+            <button @click='click'>{{message}}</button>
+        `,
+    setup() {
+      // 数据劫持
+      // const state = new Proxy(
+      //   {
+      //     message: "Hello Vue 3!!",
+      //   },
+      //   {
+      //     set(target, key, value, receiver) {
+      //       const ret = Reflect.set(target, key, value, receiver);
+      //       // 触发函数响应
+      //       effective();
+      //       return ret;
+      //     },
+      //   }
+      // );
+      
+      // 数据响应
+      const state = reactive({
+        message: "Hello Vue 3!!",
+      });
+
+      const click = () => {
+        state.message = state.message.split("").reverse().join("");
+      };
+      return { state, click };
+    },
+  };
+  const { createApp } = Vue;
+  createApp(App).mount("#app");
+</script>
+</html>
